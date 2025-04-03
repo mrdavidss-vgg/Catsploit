@@ -12,3 +12,6 @@ If the Data URL doesn't work please try doing replacing data: with data:// .
 We currently have 1 offical URL hosted.
 1. [Catsploit Link #1](https://catsploit.pages.dev/) / pages.dev link
 2. [Catsploit Link #2](https://catsploit.glitch.me) / glitch.me link
+
+# Contact me
+[Discord](https://discord.com/users/959880218263310406)

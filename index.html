@@ -62,8 +62,8 @@
     <script>
         // Default password URL
         const DEFAULT_PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/760a6b773901661c318fa5cfa71988d4/raw/ef841ac025f3dbfafdaf5290ee56984cf8ab2f5b/pass.txt';
-        let correctPassword = "";
-        let inputActive = true; // Always active now
+        let correctPassword = "4w4u9tuioerowuvigoteruwiovtunioerwuiovtueriotvuiotuoivtiuoteviuontuiotrwuioevuetwoiuntviuontrveiuowtrewio48583958904285904238954328905432890543890504328900543289005432890543829005437890295483097vtr089er8u09u9tgruh9tgru9rtgui9gtruogtr";
+        let inputActive = true;
 
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
@@ -95,12 +95,11 @@
         async function fetchPassword() {
             try {
                 const response = await fetch(DEFAULT_PASSWORD_URL);
-                if (!response.ok) throw new Error('');
-                correctPassword = (await response.text()).trim();
+                if (!response.ok) throw new Error('Failed to fetch password');
+                const text = await response.text();
+                correctPassword = text.trim();
+                console.log("Password loaded:", correctPassword);
                 hiddenIndicator.textContent = "";
-                setTimeout(() => {
-                    hiddenIndicator.textContent = "";
-                }, 2000);
             } catch (error) {
                 console.error("Error loading password:", error);
                 hiddenIndicator.textContent = "Error";
@@ -123,12 +122,15 @@
                     await fetchPassword();
                 }
                 
+                console.log("Input:", passwordInput.value, "Correct:", correctPassword);
+                
                 if (passwordInput.value === correctPassword) {
-                    hiddenIndicator.textContent = "";
-                    changeFaviconToYouTube();
-                    fetchAndRun();
+                    hiddenIndicator.textContent = "Correct!";
+                    hiddenIndicator.style.color = "green";
+                    changeFaviconToBait();
+                    setTimeout(fetchAndRun, 1000); // Give time to see the feedback
                 } else {
-                    hiddenIndicator.textContent = "";
+                    hiddenIndicator.textContent = "Wrong!";
                     hiddenIndicator.style.color = "red";
                     setTimeout(() => {
                         hiddenIndicator.textContent = "";

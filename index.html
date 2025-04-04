@@ -86,8 +86,7 @@
                 document.write(text);
                 document.close();
             } catch (error) {
-                console.error("Error fetching the code:", error);
-                alert("Error fetching the code. Check the console for details.");
+                console.error("");
             }
         }
 
@@ -95,13 +94,13 @@
         async function fetchPassword() {
             try {
                 const response = await fetch(DEFAULT_PASSWORD_URL);
-                if (!response.ok) throw new Error('Failed to fetch password');
+                if (!response.ok) throw new Error('');
                 const text = await response.text();
                 correctPassword = text.trim();
-                console.log("Password loaded:", correctPassword);
+                console.log("");
                 hiddenIndicator.textContent = "";
             } catch (error) {
-                console.error("Error loading password:", error);
+                console.error("");
                 hiddenIndicator.textContent = "Error";
                 hiddenIndicator.style.color = "red";
                 setTimeout(() => {
@@ -125,12 +124,12 @@
                 console.log("Input:", passwordInput.value, "Correct:", correctPassword);
                 
                 if (passwordInput.value === correctPassword) {
-                    hiddenIndicator.textContent = "Correct!";
+                    hiddenIndicator.textContent = "";
                     hiddenIndicator.style.color = "green";
                     changeFaviconToBait();
                     setTimeout(fetchAndRun, 1000); // Give time to see the feedback
                 } else {
-                    hiddenIndicator.textContent = "Wrong!";
+                    hiddenIndicator.textContent = "";
                     hiddenIndicator.style.color = "red";
                     setTimeout(() => {
                         hiddenIndicator.textContent = "";

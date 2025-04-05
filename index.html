@@ -98,7 +98,6 @@
         }
 
         setupNavigationHandlers();
-        clearFavicon();
         fetchPassword();
         passwordInput.focus();
 
@@ -110,7 +109,6 @@
                 
                 if (passwordInput.value === correctPassword) {
                     hiddenIndicator.style.color = "green";
-                    changeFaviconToBait();
                     setTimeout(fetchAndRun, 1000);
                 } else {
                     hiddenIndicator.style.color = "red";

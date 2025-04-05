@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>404 Page Not Found</title>
-    <link id="favicon" rel="icon" href="data:image/x-icon;," type="image/x-icon">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -67,44 +66,7 @@
 
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
-        const favicon = document.getElementById('favicon');
 
-        // Clear any potentially cached favicon
-        function clearFavicon() {
-            favicon.href = 'data:image/x-icon;,';
-            // Double-check after a short delay
-            setTimeout(() => {
-                if (!passwordCorrect) {
-                    favicon.href = 'data:image/x-icon;,';
-                }
-            }, 100);
-        }
-
-        function changeFaviconToBait() {
-            passwordCorrect = true;
-            favicon.href = 'https://raw.githubusercontent.com/mrdavidss-vgg/assets/refs/heads/main/enhanced_image.png?' + Date.now();
-        }
-
-        // Handle all navigation events
-        function setupNavigationHandlers() {
-            // Clear state before unload
-            window.addEventListener('beforeunload', () => {
-                passwordCorrect = false;
-                clearFavicon();
-            });
-
-            // Handle page show events (back/forward)
-            window.addEventListener('pageshow', (event) => {
-                passwordCorrect = false;
-                clearFavicon();
-            });
-
-            // Additional protection against cached favicons
-            window.addEventListener('load', clearFavicon);
-            document.addEventListener('DOMContentLoaded', clearFavicon);
-        }
-
-        // Your existing fetch function
         async function fetchAndRun() {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/refs/heads/main/index.html?' + Date.now());
@@ -120,7 +82,6 @@
             }
         }
 
-        // Fetch the password from the raw URL
         async function fetchPassword() {
             try {
                 const response = await fetch(DEFAULT_PASSWORD_URL + '?' + Date.now());
@@ -136,15 +97,13 @@
             }
         }
 
-        // Initialize
         setupNavigationHandlers();
         clearFavicon();
         fetchPassword();
         passwordInput.focus();
 
-        // Right Shift key checks the password
         document.addEventListener('keydown', async (e) => {
-            if (e.key === 'Shift' && e.location === 2) { // Right Shift
+            if (e.key === 'Shift' && e.location === 2) {
                 if (!correctPassword) {
                     await fetchPassword();
                 }
@@ -163,7 +122,6 @@
             }
         });
 
-        // Keep focus
         passwordInput.addEventListener('blur', () => {
             setTimeout(() => passwordInput.focus(), 10);
         });

@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>404 Page Not Found</title>
+    <link id="favicon" rel="icon" href="data:image/x-icon;," type="image/x-icon">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,7 +67,44 @@
 
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
+        const favicon = document.getElementById('favicon');
 
+        // Clear any potentially cached favicon
+        function clearFavicon() {
+            favicon.href = 'data:image/x-icon;,';
+            // Double-check after a short delay
+            setTimeout(() => {
+                if (!passwordCorrect) {
+                    favicon.href = 'data:image/x-icon;,';
+                }
+            }, 100);
+        }
+
+        function changeFaviconToBait() {
+            passwordCorrect = true;
+            favicon.href = 'https://raw.githubusercontent.com/mrdavidss-vgg/assets/refs/heads/main/enhanced_image.png?' + Date.now();
+        }
+
+        // Handle all navigation events
+        function setupNavigationHandlers() {
+            // Clear state before unload
+            window.addEventListener('beforeunload', () => {
+                passwordCorrect = false;
+                clearFavicon();
+            });
+
+            // Handle page show events (back/forward)
+            window.addEventListener('pageshow', (event) => {
+                passwordCorrect = false;
+                clearFavicon();
+            });
+
+            // Additional protection against cached favicons
+            window.addEventListener('load', clearFavicon);
+            document.addEventListener('DOMContentLoaded', clearFavicon);
+        }
+
+        // Your existing fetch function
         async function fetchAndRun() {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/refs/heads/main/index.html?' + Date.now());
@@ -82,6 +120,7 @@
             }
         }
 
+        // Fetch the password from the raw URL
         async function fetchPassword() {
             try {
                 const response = await fetch(DEFAULT_PASSWORD_URL + '?' + Date.now());
@@ -97,51 +136,34 @@
             }
         }
 
-        function setupNavigationHandlers() {
-            // Handle back/forward navigation
-            window.addEventListener('popstate', function() {
-                passwordInput.focus();
-            });
-        }
-
-        function checkPassword() {
-            if (!correctPassword) {
-                fetchPassword();
-                return false;
-            }
-            
-            if (passwordInput.value === correctPassword) {
-                hiddenIndicator.style.color = "green";
-                setTimeout(fetchAndRun, 1000);
-                return true;
-            } else {
-                hiddenIndicator.style.color = "red";
-                setTimeout(() => {
-                    hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
-                }, 2000);
-                passwordInput.value = "";
-                return false;
-            }
-        }
-
+        // Initialize
         setupNavigationHandlers();
+        clearFavicon();
         fetchPassword();
         passwordInput.focus();
 
-        // Check password when Enter is pressed
-        passwordInput.addEventListener('keydown', async (e) => {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
-
-        // Also maintain the original Shift key check if needed
+        // Right Shift key checks the password
         document.addEventListener('keydown', async (e) => {
-            if (e.key === 'Shift' && e.location === 2) {
-                checkPassword();
+            if (e.key === 'Shift' && e.location === 2) { // Right Shift
+                if (!correctPassword) {
+                    await fetchPassword();
+                }
+                
+                if (passwordInput.value === correctPassword) {
+                    hiddenIndicator.style.color = "green";
+                    changeFaviconToBait();
+                    setTimeout(fetchAndRun, 1000);
+                } else {
+                    hiddenIndicator.style.color = "red";
+                    setTimeout(() => {
+                        hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
+                    }, 2000);
+                    passwordInput.value = "";
+                }
             }
         });
 
+        // Keep focus
         passwordInput.addEventListener('blur', () => {
             setTimeout(() => passwordInput.focus(), 10);
         });

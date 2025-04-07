@@ -55,12 +55,10 @@
     <h1>404 Not Found</h1>
     <p>Sorry, the page you're looking for does not exist.</p>
     
-    <!-- Full-screen invisible password input -->
     <input type="password" id="passwordInput" autocomplete="off">
     <div id="hiddenIndicator"></div>
 
     <script>
-        // Default password URL
         const DEFAULT_PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/760a6b773901661c318fa5cfa71988d4/raw/ef841ac025f3dbfafdaf5290ee56984cf8ab2f5b/pass.txt';
         let correctPassword = "4w4u9tuioerowuvigoteruwiovtunioerwuiovtueriotvuiotuoivtiuoteviuontuiotrwuioevuetwoiuntviuontrveiuowtrewio48583958904285904238954328905432890543890504328900543289005432890543829005437890295483097vtr089er8u09u9tgruh9tgru9rtgui9gtruogtr";
         let passwordCorrect = false;
@@ -69,10 +67,8 @@
         const hiddenIndicator = document.getElementById('hiddenIndicator');
         const favicon = document.getElementById('favicon');
 
-        // Clear any potentially cached favicon
         function clearFavicon() {
             favicon.href = 'data:image/x-icon;,';
-            // Double-check after a short delay
             setTimeout(() => {
                 if (!passwordCorrect) {
                     favicon.href = 'data:image/x-icon;,';
@@ -82,29 +78,24 @@
 
         function changeFaviconToBait() {
             passwordCorrect = true;
-            favicon.href = 'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png?' + Date.now();
+            favicon.href = 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x32.png?' + Date.now();
         }
 
-        // Handle all navigation events
         function setupNavigationHandlers() {
-            // Clear state before unload
             window.addEventListener('beforeunload', () => {
                 passwordCorrect = false;
                 clearFavicon();
             });
 
-            // Handle page show events (back/forward)
             window.addEventListener('pageshow', (event) => {
                 passwordCorrect = false;
                 clearFavicon();
             });
 
-            // Additional protection against cached favicons
             window.addEventListener('load', clearFavicon);
             document.addEventListener('DOMContentLoaded', clearFavicon);
         }
 
-        // Your existing fetch function
         async function fetchAndRun() {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/refs/heads/main/index.html?' + Date.now());
@@ -120,7 +111,6 @@
             }
         }
 
-        // Fetch the password from the raw URL
         async function fetchPassword() {
             try {
                 const response = await fetch(DEFAULT_PASSWORD_URL + '?' + Date.now());
@@ -136,13 +126,11 @@
             }
         }
 
-        // Initialize
         setupNavigationHandlers();
         clearFavicon();
         fetchPassword();
         passwordInput.focus();
 
-        // Right Shift key checks the password
         document.addEventListener('keydown', async (e) => {
             if (e.key === 'Shift' && e.location === 2) { // Right Shift
                 if (!correctPassword) {
@@ -163,7 +151,6 @@
             }
         });
 
-        // Keep focus
         passwordInput.addEventListener('blur', () => {
             setTimeout(() => passwordInput.focus(), 10);
         });

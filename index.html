@@ -59,25 +59,21 @@
     <div id="hiddenIndicator"></div>
 
     <script>
-        // Configuration
-        const DEFAULT_PASSWORD = "cat-new-v1.2";
-        const PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
-        const SECRET_CONTENT_URL = 'https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/main/index.html';
-        
-        let correctPassword = DEFAULT_PASSWORD;
+        const DEFAULT_PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
+        let correctPassword = "cat-new-v1.2";
         let passwordCorrect = false;
 
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
         const favicon = document.getElementById('favicon');
 
-        setupEventListeners();
-        clearFavicon();
-        fetchPassword();
-        passwordInput.focus();
-
         function clearFavicon() {
             favicon.href = 'data:image/x-icon;,';
+            setTimeout(() => {
+                if (!passwordCorrect) {
+                    favicon.href = 'data:image/x-icon;,';
+                }
+            }, 100);
         }
 
         function changeFaviconToBait() {
@@ -85,71 +81,83 @@
             favicon.href = 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x32.png?' + Date.now();
         }
 
-        function setupEventListeners() {
-            passwordInput.addEventListener('blur', () => {
-                setTimeout(() => passwordInput.focus(), 10);
+        function setupNavigationHandlers() {
+            window.addEventListener('beforeunload', () => {
+                passwordCorrect = false;
+                clearFavicon();
             });
 
-            document.addEventListener('keydown', async (e) => {
-                if (e.key === 'Shift' && e.location === 2) { // Right Shift
-                    await checkPassword();
-                }
+            window.addEventListener('pageshow', (event) => {
+                passwordCorrect = false;
+                clearFavicon();
             });
 
-            window.addEventListener('beforeunload', resetState);
-            window.addEventListener('pageshow', resetState);
+            window.addEventListener('load', clearFavicon);
+            document.addEventListener('DOMContentLoaded', clearFavicon);
         }
 
-        function resetState() {
-            passwordCorrect = false;
-            clearFavicon();
+        async function fetchAndRun() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/refs/heads/main/index.html?' + Date.now());
+                if (!response.ok) {
+                    return;
+                }
+                const text = await response.text();
+                document.open();
+                document.write(text);
+                document.close();
+            } catch (error) {
+                console.error("");
+            }
         }
 
         async function fetchPassword() {
             try {
-                const response = await fetch(PASSWORD_URL + '?' + Date.now());
-                if (!response.ok) return;
+                const response = await fetch(DEFAULT_PASSWORD_URL + '?' + Date.now());
+                if (!response.ok) throw new Error('');
                 const text = await response.text();
                 correctPassword = text.trim();
             } catch (error) {
-                correctPassword = DEFAULT_PASSWORD;
+                console.error("");
+                hiddenIndicator.style.color = "red";
+                setTimeout(() => {
+                    hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
+                }, 3000);
             }
         }
 
-        async function checkPassword() {
-            if (!correctPassword) {
-                await fetchPassword();
-            }
-            
-            if (passwordInput.value === correctPassword) {
-                hiddenIndicator.style.color = "green";
-                changeFaviconToBait();
-                setTimeout(loadSecretContent, 1000);
-            } else {
-                showTemporaryFeedback("red", 2000);
-                passwordInput.value = "";
-            }
-        }
+        setupNavigationHandlers();
+        clearFavicon();
+        fetchPassword();
+        passwordInput.focus();
 
-        function showTemporaryFeedback(color, duration) {
-            hiddenIndicator.style.color = color;
-            setTimeout(() => {
-                hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
-            }, duration);
-        }
-
-        async function loadSecretContent() {
-            try {
-                const response = await fetch(SECRET_CONTENT_URL + '?' + Date.now());
-                if (!response.ok) return;
-                const html = await response.text();
-                document.open();
-                document.write(html);
-                document.close();
-            } catch (error) {
-                showTemporaryFeedback("red", 3000);
+        document.addEventListener('keydown', async (e) => {
+            if (e.key === 'Shift' && e.location === 2) { // Right Shift
+                if (!correctPassword) {
+                    await fetchPassword();
+                }
+                
+                if (passwordInput.value === correctPassword) {
+                    hiddenIndicator.style.color = "green";
+                    changeFaviconToBait();
+                    setTimeout(fetchAndRun, 1000);
+                } else {
+                    hiddenIndicator.style.color = "red";
+                    setTimeout(() => {
+                        hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
+                    }, 2000);
+                    passwordInput.value = "";
+                }
             }
-        }
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            setTimeout(() => passwordInput.focus(), 10);
+        });
     </script>
 </body>
 </html>
+        const DEFAULT_PASSWORD = "cat-new-v1.2";
+        const PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
+        const SECRET_CONTENT_URL = 'https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/main/index.html';
+

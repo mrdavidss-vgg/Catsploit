@@ -2,7 +2,7 @@
 Catsploit is has varity of tools to remove school filters / extensions.
 
 # Release Version
-https://img.shields.io/github/release/mrdavidss-vgg/catsploit.svg?color=82d2f0&labelColor=0d3b72&style=for-the-badge
+<img src="https://img.shields.io/github/release/mrdavidss-vgg/catsploit.svg?color=82d2f0&labelColor=0d3b72&style=for-the-badge" alt="Release"/>
 
 # Data URL
 Data URL

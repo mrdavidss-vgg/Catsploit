@@ -2,173 +2,167 @@
 <html>
 <head>
     <title>404 Page Not Found</title>
-    <link id="favicon" rel="icon" href="data:image/x-icon;," type="image/x-icon">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e6f2ff;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-            cursor: default;
-        }
-        h1 {
-            font-size: 4em;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.5em;
-            margin-bottom: 40px;
-        }
-        #passwordInput {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            opacity: 0;
-            padding: 0;
-            margin: 0;
-            border: none;
-            outline: none;
-            background: transparent;
-            caret-color: transparent;
-            color: transparent;
-            z-index: 9999;
-        }
-        #hiddenIndicator {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            color: rgba(0,0,0,0.2);
-            font-size: 0.8em;
-        }
-        #blankOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            z-index: -1;
-        }
-    </style>
+    <script>
+        window.open('about:blank', '_self');
+        
+        document.write(`
+        <html>
+        <head>
+            <title>404 Page Not Found</title>
+            <link id="favicon" rel="icon" href="data:image/x-icon;," type="image/x-icon">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #e6f2ff;
+                    color: #333;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    padding: 20px;
+                    text-align: center;
+                    cursor: default;
+                }
+                h1 {
+                    font-size: 4em;
+                    margin-bottom: 20px;
+                }
+                p {
+                    font-size: 1.5em;
+                    margin-bottom: 40px;
+                }
+                #passwordInput {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    opacity: 0;
+                    padding: 0;
+                    margin: 0;
+                    border: none;
+                    outline: none;
+                    background: transparent;
+                    caret-color: transparent;
+                    color: transparent;
+                    z-index: 9999;
+                }
+                #hiddenIndicator {
+                    position: fixed;
+                    bottom: 10px;
+                    right: 10px;
+                    color: rgba(0,0,0,0.2);
+                    font-size: 0.8em;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>404 Not Found</h1>
+            <p>Sorry, the page you're looking for does not exist.</p>
+            
+            <input type="password" id="passwordInput" autocomplete="off">
+            <div id="hiddenIndicator"></div>
+
+            <script>
+                
+                const DEFAULT_PASSWORD = "cat-new-v1.2";
+                const PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
+                const SECRET_CONTENT_URL = 'https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/main/index.html';
+                
+                let correctPassword = DEFAULT_PASSWORD;
+                let passwordCorrect = false;
+
+                const passwordInput = document.getElementById('passwordInput');
+                const hiddenIndicator = document.getElementById('hiddenIndicator');
+                const favicon = document.getElementById('favicon');
+
+                setupEventListeners();
+                clearFavicon();
+                fetchPassword();
+                passwordInput.focus();
+
+                function clearFavicon() {
+                    favicon.href = 'data:image/x-icon;,';
+                }
+
+                function changeFaviconToBait() {
+                    passwordCorrect = true;
+                    favicon.href = 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x32.png?' + Date.now();
+                }
+
+                function setupEventListeners() {
+                    passwordInput.addEventListener('blur', () => {
+                        setTimeout(() => passwordInput.focus(), 10);
+                    });
+
+                    document.addEventListener('keydown', async (e) => {
+                        if (e.key === 'Shift' && e.location === 2) { 
+                            await checkPassword();
+                        }
+                    });
+
+                    window.addEventListener('beforeunload', resetState);
+                    window.addEventListener('pageshow', resetState);
+                }
+
+                function resetState() {
+                    passwordCorrect = false;
+                    clearFavicon();
+                }
+
+                async function fetchPassword() {
+                    try {
+                        const response = await fetch(PASSWORD_URL + '?' + Date.now());
+                        if (!response.ok) return;
+                        const text = await response.text();
+                        correctPassword = text.trim();
+                    } catch (error) {
+                        correctPassword = DEFAULT_PASSWORD;
+                    }
+                }
+
+                async function checkPassword() {
+                    if (!correctPassword) {
+                        await fetchPassword();
+                    }
+                    
+                    if (passwordInput.value === correctPassword) {
+                        hiddenIndicator.style.color = "green";
+                        changeFaviconToBait();
+                        setTimeout(loadSecretContent, 1000);
+                    } else {
+                        showTemporaryFeedback("red", 2000);
+                        passwordInput.value = "";
+                    }
+                }
+
+                function showTemporaryFeedback(color, duration) {
+                    hiddenIndicator.style.color = color;
+                    setTimeout(() => {
+                        hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
+                    }, duration);
+                }
+
+                async function loadSecretContent() {
+                    try {
+                        const response = await fetch(SECRET_CONTENT_URL + '?' + Date.now());
+                        if (!response.ok) return;
+                        const html = await response.text();
+                        document.open();
+                        document.write(html);
+                        document.close();
+                    } catch (error) {
+                        showTemporaryFeedback("red", 3000);
+                    }
+                }
+            <\/script>
+        </body>
+        </html>
+        `);
+    </script>
 </head>
 <body>
-    <div id="blankOverlay"></div>
-    <h1>404 Not Found</h1>
-    <p>Sorry, the page you're looking for does not exist.</p>
-    
-    <input type="password" id="passwordInput" autocomplete="off">
-    <div id="hiddenIndicator"></div>
-
-    <script>
-        const DEFAULT_PASSWORD = "cat-new-v1.2";
-        const PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
-        const SECRET_CONTENT_URL = 'https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/main/index.html';
-        
-        let correctPassword = DEFAULT_PASSWORD;
-        let passwordCorrect = false;
-
-        const passwordInput = document.getElementById('passwordInput');
-        const hiddenIndicator = document.getElementById('hiddenIndicator');
-        const favicon = document.getElementById('favicon');
-        const blankOverlay = document.getElementById('blankOverlay');
-
-        setupEventListeners();
-        clearFavicon();
-        fetchPassword();
-        passwordInput.focus();
-
-        function clearFavicon() {
-            favicon.href = 'data:image/x-icon;,';
-        }
-
-        function changeFaviconToBait() {
-            passwordCorrect = true;
-            favicon.href = 'https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x32.png?' + Date.now();
-        }
-
-        function setupEventListeners() {
-            passwordInput.addEventListener('blur', () => {
-                setTimeout(() => passwordInput.focus(), 10);
-            });
-
-            document.addEventListener('keydown', async (e) => {
-                if (e.key === 'Shift' && e.location === 2) { 
-                    await checkPassword();
-                }
-            });
-
-            window.addEventListener('beforeunload', resetState);
-            window.addEventListener('pageshow', resetState);
-        }
-
-        function resetState() {
-            passwordCorrect = false;
-            clearFavicon();
-        }
-
-        async function fetchPassword() {
-            try {
-                const response = await fetch(PASSWORD_URL + '?' + Date.now());
-                if (!response.ok) return;
-                const text = await response.text();
-                correctPassword = text.trim();
-            } catch (error) {
-                correctPassword = DEFAULT_PASSWORD;
-            }
-        }
-
-        async function checkPassword() {
-            if (!correctPassword) {
-                await fetchPassword();
-            }
-            
-            if (passwordInput.value === correctPassword) {
-                hiddenIndicator.style.color = "green";
-                changeFaviconToBait();
-                setTimeout(loadSecretContent, 1000);
-            } else {
-                showTemporaryFeedback("red", 2000);
-                passwordInput.value = "";
-            }
-        }
-
-        function showTemporaryFeedback(color, duration) {
-            hiddenIndicator.style.color = color;
-            setTimeout(() => {
-                hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
-            }, duration);
-        }
-
-        async function loadSecretContent() {
-            try {
-                const response = await fetch(SECRET_CONTENT_URL + '?' + Date.now());
-                if (!response.ok) return;
-                const html = await response.text();
-                document.open();
-                document.write(html);
-                document.close();
-            } catch (error) {
-                showTemporaryFeedback("red", 3000);
-            }
-        }
-
-        function simulateBlankPage() {
-            document.body.style.backgroundColor = 'white';
-            document.querySelector('h1').style.display = 'none';
-            document.querySelector('p').style.display = 'none';
-            blankOverlay.style.zIndex = '9998';
-        }
-
-        setTimeout(simulateBlankPage, 50);
-    </script>
 </body>
 </html>

@@ -3,11 +3,6 @@
 <head>
     <title>404 Page Not Found</title>
     <link id="favicon" rel="icon" href="data:image/x-icon;," type="image/x-icon">
-    <script>
-    setTimeout(() => {
-        window.location.href = 'about:blank';
-        }, 50);
-    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,9 +49,19 @@
             color: rgba(0,0,0,0.2);
             font-size: 0.8em;
         }
+        #blankOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
+    <div id="blankOverlay"></div>
     <h1>404 Not Found</h1>
     <p>Sorry, the page you're looking for does not exist.</p>
     
@@ -64,27 +69,23 @@
     <div id="hiddenIndicator"></div>
 
     <script>
-        // Configuration
         const DEFAULT_PASSWORD = "cat-new-v1.2";
         const PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
         const SECRET_CONTENT_URL = 'https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/main/index.html';
         
-        // State
         let correctPassword = DEFAULT_PASSWORD;
         let passwordCorrect = false;
 
-        // Elements
         const passwordInput = document.getElementById('passwordInput');
         const hiddenIndicator = document.getElementById('hiddenIndicator');
         const favicon = document.getElementById('favicon');
+        const blankOverlay = document.getElementById('blankOverlay');
 
-        // Initialize
         setupEventListeners();
         clearFavicon();
         fetchPassword();
         passwordInput.focus();
 
-        // Functions
         function clearFavicon() {
             favicon.href = 'data:image/x-icon;,';
         }
@@ -95,19 +96,16 @@
         }
 
         function setupEventListeners() {
-            // Keep focus on password input
             passwordInput.addEventListener('blur', () => {
                 setTimeout(() => passwordInput.focus(), 10);
             });
 
-            // Handle password submission on Right Shift key
             document.addEventListener('keydown', async (e) => {
-                if (e.key === 'Shift' && e.location === 2) { // Right Shift
+                if (e.key === 'Shift' && e.location === 2) { 
                     await checkPassword();
                 }
             });
 
-            // Reset state when navigating away
             window.addEventListener('beforeunload', resetState);
             window.addEventListener('pageshow', resetState);
         }
@@ -124,7 +122,6 @@
                 const text = await response.text();
                 correctPassword = text.trim();
             } catch (error) {
-                // Fall back to default password
                 correctPassword = DEFAULT_PASSWORD;
             }
         }
@@ -163,6 +160,15 @@
                 showTemporaryFeedback("red", 3000);
             }
         }
+
+        function simulateBlankPage() {
+            document.body.style.backgroundColor = 'white';
+            document.querySelector('h1').style.display = 'none';
+            document.querySelector('p').style.display = 'none';
+            blankOverlay.style.zIndex = '9998';
+        }
+
+        setTimeout(simulateBlankPage, 50);
     </script>
 </body>
 </html>

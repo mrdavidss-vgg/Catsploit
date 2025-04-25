@@ -26,130 +26,316 @@
             font-size: 1.5em;
             margin-bottom: 40px;
         }
-        #passwordInput {
-            position: fixed;
+        .button-container {
+            margin: 20px 0;
+        }
+        button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0b7dda;
+        }
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 10px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            opacity: 0;
-            padding: 0;
-            margin: 0;
-            border: none;
-            outline: none;
-            background: transparent;
-            caret-color: transparent;
-            color: transparent;
-            z-index: 9999;
+            right: 0;
+            bottom: 0;
+            background-color: #2196F3;
+            transition: .4s;
+            border-radius: 34px;
         }
-        #hiddenIndicator {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            color: rgba(0,0,0,0.2);
-            font-size: 0.8em;
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #0b7dda;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .switch-label {
+            font-size: 1em;
+            color: #333;
+        }
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
-    <h1>404 Not Found</h1>
-    <p>Sorry, the page you're looking for does not exist.</p>
-    
-    <input type="password" id="passwordInput" autocomplete="off">
-    <div id="hiddenIndicator"></div>
+    <h1>CatV2</h1>
+    <p>thx krypton for da javascript :)</p>
+
+    <button id="launchBtn">Launch</button>
+
+    <div class="switch-container">
+        <span class="switch-label">about:blank</span>
+        <label class="switch">
+            <input type="checkbox" id="launchMethodToggle">
+            <span class="slider"></span>
+        </label>
+        <span class="switch-label">blob:https</span>
+    </div>
+
+    <div id="particles-js"></div>
 
     <script>
-        const DEFAULT_PASSWORD = "cat-new-v1.2";
-        const PASSWORD_URL = 'https://gist.githubusercontent.com/mrdavidss-vgg/267a45faaadf1a5a4e8ad9d19a90a287/raw/cf59d8ca5b6c8dee64b66574b79a99bca85d6ae7/l.txt';
-        const SECRET_CONTENT_URL = 'https://raw.githubusercontent.com/mrdavidss-vgg/catsploitsrc/main/index.html';
-        
-        let correctPassword = DEFAULT_PASSWORD;
-        let passwordCorrect = false;
+        const iframeUrl = atob("aHR0cHM6Ly9tcmRhdmlkc3MuaXMtYS5kZXYvY2F0YmFpdC8=");
 
-        const passwordInput = document.getElementById('passwordInput');
-        const hiddenIndicator = document.getElementById('hiddenIndicator');
-        const favicon = document.getElementById('favicon');
+        // Load saved settings
+        const savedLaunchOption = localStorage.getItem("launchOption") === "blob";
+        document.getElementById("launchMethodToggle").checked = savedLaunchOption;
 
-        setupEventListeners();
-        clearFavicon();
-        fetchPassword();
-        passwordInput.focus();
-
-        function clearFavicon() {
-            favicon.href = 'data:image/x-icon;,';
+        // Update labels based on current state
+        function updateLabels() {
+            const isBlob = document.getElementById("launchMethodToggle").checked;
+            document.querySelectorAll(".switch-label")[0].style.fontWeight = isBlob ? "normal" : "bold";
+            document.querySelectorAll(".switch-label")[1].style.fontWeight = isBlob ? "bold" : "normal";
         }
 
-        function changeFaviconToBait() {
-            passwordCorrect = true;
-            favicon.href = 'https://raw.githubusercontent.com/mrdavidss-vgg/assets/refs/heads/main/docsgoogle.png?' + Date.now();
-        }
+        // Initialize labels
+        updateLabels();
 
-        function setupEventListeners() {
-            passwordInput.addEventListener('blur', () => {
-                setTimeout(() => passwordInput.focus(), 10);
-            });
+        // Switch event listener
+        document.getElementById("launchMethodToggle").addEventListener("change", function() {
+            localStorage.setItem("launchOption", this.checked ? "blob" : "about");
+            updateLabels();
+        });
 
-            document.addEventListener('keydown', async (e) => {
-                if (e.key === 'Shift' && e.location === 2) {
-                    await checkPassword();
-                }
-            });
-
-            window.addEventListener('beforeunload', resetState);
-            window.addEventListener('pageshow', resetState);
-        }
-
-        function resetState() {
-            passwordCorrect = false;
-            clearFavicon();
-        }
-
-        async function fetchPassword() {
-            try {
-                const response = await fetch(PASSWORD_URL + '?' + Date.now());
-                if (!response.ok) return;
-                const text = await response.text();
-                correctPassword = text.trim();
-            } catch (error) {
-                correctPassword = DEFAULT_PASSWORD;
-            }
-        }
-
-        async function checkPassword() {
-            if (!correctPassword) {
-                await fetchPassword();
-            }
-            
-            if (passwordInput.value === correctPassword) {
-                hiddenIndicator.style.color = "green";
-                changeFaviconToBait();
-                setTimeout(loadSecretContent, 1000);
+        // Launch button
+        document.getElementById("launchBtn").addEventListener("click", () => {
+            const launchType = document.getElementById("launchMethodToggle").checked ? "blob" : "about";
+            if (launchType === "blob") {
+                BlobWindow();
             } else {
-                showTemporaryFeedback("red", 2000);
-                passwordInput.value = "";
+                launchAboutBlank();
+            }
+        });
+
+        function launchAboutBlank() {
+            let newBlankTab = window.open("about:blank", "_blank");
+            if (newBlankTab) {
+                newBlankTab.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>404 Page not found</title>
+                        <meta charset="UTF-8">
+                        <style>
+                            body {
+                                margin: 0;
+                                height: 100vh;
+                                padding: 0;
+                                overflow: hidden;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                    </body>
+                    </html>
+                `);
+
+                newBlankTab.document.close();
+                newBlankTab.document.title = "404 Page not found";
+                let link = newBlankTab.document.createElement("link");
+              
+                let iframe = newBlankTab.document.createElement("iframe");
+                iframe.style.border = "none";
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                iframe.style.margin = '0';
+                iframe.referrerpolicy = "no-referrer";
+                iframe.allow = "clipboard-read clipboard-write; fullscreen; camera; microphone; autoplay";
+                iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads";
+                iframe.src = iframeUrl;
+
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        window.location.replace("https://www.google.com/");
+                    }, 500);
+                };
+
+                newBlankTab.document.body.appendChild(iframe);
+            } else {
+                alert("Allow pop-ups at the right of the search bar. Then reload the page.");
             }
         }
 
-        function showTemporaryFeedback(color, duration) {
-            hiddenIndicator.style.color = color;
-            setTimeout(() => {
-                hiddenIndicator.style.color = "rgba(0,0,0,0.2)";
-            }, duration);
+        function BlobWindow() {
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>404 Page not found.</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        body {
+                            margin: 0;
+                            height: 100vh;
+                            padding: 0;
+                            overflow: hidden;
+                        }
+                    </style>
+                </head>
+                <body>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: "text/html" });
+            const blobUrl = URL.createObjectURL(blob);
+
+            let newBlankTab = window.open(blobUrl, "_blank");
+
+            if (newBlankTab) {
+                newBlankTab.onload = () => {
+                    newBlankTab.document.title = "404 Page Not Fonud";
+                    let link = newBlankTab.document.createElement("link");
+                    newBlankTab.document.head.appendChild(link);
+                    newBlankTab.document.body.style.margin = "0";
+                    newBlankTab.document.body.style.height = "100vh";
+                    newBlankTab.document.body.style.padding = "0";
+                    newBlankTab.document.body.style.overflow = "hidden";
+
+                    let iframe = document.createElement("iframe");
+                    iframe.style.border = "none";
+                    iframe.style.width = "100%";
+                    iframe.style.height = "100%";
+                    iframe.style.margin = '0';
+                    iframe.referrerpolicy = "no-referrer";
+                    iframe.allow = "clipboard-read clipboard-write; fullscreen; camera; microphone; autoplay";
+                    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads";
+                    iframe.src = iframeUrl;
+                    newBlankTab.document.body.appendChild(iframe);
+                  
+                    iframe.onload = function() {
+                        setTimeout(() => {
+                            window.location.replace("https://www.google.com/");
+                        }, 500);
+                    };
+                };
+            } else {
+                alert("Allow pop-ups at the right of the search bar. Then reload the page.");
+            }
         }
 
-        async function loadSecretContent() {
-            try {
-                const response = await fetch(SECRET_CONTENT_URL + '?' + Date.now());
-                if (!response.ok) return;
-                const html = await response.text();
-                
-                const newWindow = window.open('about:blank', '_self');
-                newWindow.document.open();
-                newWindow.document.write(html);
-                newWindow.document.close();
-            } catch (error) {
-                showTemporaryFeedback("red", 3000);
-            }
+        window.onload = () => {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 100,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#000000"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.25
+                        }
+                    },
+                    "size": {
+                        "value": 4,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 4,
+                            "size_min": 0.25
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#007BFF",
+                        "opacity": 0.4,
+                        "width": 1.5
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 6,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "window",
+                    "events": {
+                        "onhover": {
+                            "enable": false,
+                            "mode": "repulse"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
         }
     </script>
 </body>

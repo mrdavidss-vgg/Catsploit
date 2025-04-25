@@ -143,7 +143,7 @@
                 if (!response.ok) return;
                 const html = await response.text();
                 
-                const newWindow = window.href.location = 'about:blank'
+                const newWindow = window.open('about:blank', '_self');
                 newWindow.document.open();
                 newWindow.document.write(html);
                 newWindow.document.close();
